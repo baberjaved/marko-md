@@ -59,6 +59,16 @@ app/mac/build.sh --install
 
 Details, DMG and notarization in [`app/mac/README.md`](app/mac/README.md). Once installed, `marko open` and the Claude Code hooks use the app instead of a browser tab.
 
+### F. Windows app
+
+The same viewer as a ~2 MB WebView2 app. Needs the .NET 8 SDK to build; in PowerShell:
+
+```
+.\app\windows\build.ps1 -Install -Default
+```
+
+Details in [`app/windows/README.md`](app/windows/README.md). Once installed, `marko open` and the hooks use it.
+
 ## Use
 
 ```

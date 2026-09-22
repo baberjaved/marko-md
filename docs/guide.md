@@ -87,6 +87,17 @@ app/mac/build.sh --install
 
 On first launch Marko offers to become the default app for `.md` files (say yes, or later use **Marko ▸ Make Default for Markdown Files**; `build.sh --install --default` sets it during install). Double-click any `.md`, drag files onto the Dock icon, or run `open -a Marko file.md`. The app reloads the document whenever the file changes, so it doubles as the live view for Claude Code: once it is in `/Applications`, `marko open` and the hooks open files in the app instead of a browser. `⌘1` `⌘2` `⌘3` switch modes, `⌘F` searches, **File ▸ Copy Updated Markdown** writes your ticks back. See `app/mac/README.md` for a DMG and notarized builds for other people.
 
+### 2.6 Windows app
+
+The Windows counterpart is a ~2 MB app built on WebView2 (the Edge runtime already in Windows 10/11). With the [.NET 8 SDK](https://dot.net) installed, in PowerShell:
+
+```
+git clone https://github.com/baberjaved/marko-md; cd marko-md
+.\app\windows\build.ps1 -Install -Default
+```
+
+That installs to `%LOCALAPPDATA%\Marko`, adds a Start Menu entry, registers Marko for `.md` files and opens the Default Apps page so you can make it the default in one click (Windows doesn't allow that step to happen silently). `Ctrl+1/2/3` switch modes, `F5` reloads, `Ctrl+F` searches, and the file reloads on its own when Claude edits it. `app\windows\README.md` covers portable zips and signing.
+
 ## 3. Verify the install
 
 ```
