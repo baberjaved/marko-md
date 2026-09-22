@@ -3,6 +3,7 @@
 #
 #   app/mac/build.sh              → app/mac/build/Marko.app  (ad-hoc signed; runs on this Mac)
 #   app/mac/build.sh --install    → also copies it to /Applications
+#   app/mac/build.sh --install --default → …and makes Marko the default app for .md files (no dialog)
 #   app/mac/build.sh --dmg        → also produces app/mac/build/Marko-<version>.dmg
 #   SIGN_IDENTITY="Developer ID Application: …" app/mac/build.sh --dmg   → signed for distribution (notarize after)
 #
@@ -84,7 +85,10 @@ for arg in "$@"; do
     --install)
       rm -rf "/Applications/Marko.app"; cp -R "$APP" /Applications/
       echo "▸ installed to /Applications/Marko.app"
-      /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/Marko.app >/dev/null 2>&1 || true ;;
+      /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/Marko.app >/dev/null 2>&1 || true
+      case " $* " in *" --default "*)
+        /Applications/Marko.app/Contents/MacOS/Marko --set-default >/dev/null 2>&1 && echo "▸ Marko is now the default app for Markdown files" || echo "▸ could not set default automatically — use Marko ▸ Make Default for Markdown Files" ;;
+      esac ;;
     --dmg)
       DMG="$OUT/Marko-$VERSION.dmg"; STAGE="$OUT/dmg"; rm -rf "$STAGE" "$DMG"; mkdir -p "$STAGE"
       cp -R "$APP" "$STAGE/"; ln -s /Applications "$STAGE/Applications"

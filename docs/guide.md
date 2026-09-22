@@ -85,7 +85,7 @@ git clone https://github.com/baberjaved/marko-md && cd marko-md
 app/mac/build.sh --install
 ```
 
-Then right-click any `.md` ▸ *Open With* ▸ *Marko* (tick *Always*), drag files onto the Dock icon, or run `open -a Marko file.md`. The app reloads the document whenever the file changes, so it doubles as the live view for Claude Code: once it is in `/Applications`, `marko open` and the hooks open files in the app instead of a browser. `⌘1` `⌘2` `⌘3` switch modes, `⌘F` searches, **File ▸ Copy Updated Markdown** writes your ticks back. See `app/mac/README.md` for a DMG and notarized builds for other people.
+On first launch Marko offers to become the default app for `.md` files (say yes, or later use **Marko ▸ Make Default for Markdown Files**; `build.sh --install --default` sets it during install). Double-click any `.md`, drag files onto the Dock icon, or run `open -a Marko file.md`. The app reloads the document whenever the file changes, so it doubles as the live view for Claude Code: once it is in `/Applications`, `marko open` and the hooks open files in the app instead of a browser. `⌘1` `⌘2` `⌘3` switch modes, `⌘F` searches, **File ▸ Copy Updated Markdown** writes your ticks back. See `app/mac/README.md` for a DMG and notarized builds for other people.
 
 ## 3. Verify the install
 

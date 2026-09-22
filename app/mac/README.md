@@ -8,6 +8,16 @@ viewer libraries are vendored into the bundle at build time.
 - `⌘1` `⌘2` `⌘3` switch Reading / Plan / Interactive · `⌘O` open · `⌘R` reload · `⌘F` search · `⌘⌥1` / `⌘⌥2` toggle outline / panel · Open Recent · Reveal in Finder · Copy Updated Markdown.
 - The `marko` CLI and the Claude Code hooks use the app automatically once it is in `/Applications` (`marko open --browser` forces the browser; `"app": false` in `.claude/marko.json` disables it).
 
+## Default app for `.md` files
+
+Marko asks once, on first launch, whether to become the default app for Markdown files. Later: **Marko ▸ Make Default for Markdown Files**, or install with it already set:
+
+```
+app/mac/build.sh --install --default
+```
+
+To undo, pick another app in Finder (select a `.md` ▸ Get Info ▸ Open with ▸ Change All).
+
 ## Build
 
 Requires Xcode Command Line Tools (`xcode-select --install`) and Node. No Xcode project.

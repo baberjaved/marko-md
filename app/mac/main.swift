@@ -54,6 +54,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         }
         web.loadFileURL(page, allowingReadAccessTo: page.deletingLastPathComponent())
         NSApp.activate(ignoringOtherApps: true)
+
+        // `Marko --set-default` (used by build.sh --install --default): set the association and quit.
+        if CommandLine.arguments.contains("--set-default") {
+            setAsDefaultMarkdownApp(interactive: false) { _ in NSApp.terminate(nil) }
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
@@ -171,6 +176,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         let appItem = NSMenuItem(); main.addItem(appItem)
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: "About Marko", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        appMenu.addItem(.separator())
+        appMenu.addItem(withTitle: "Make Default for Markdown Files", action: #selector(makeDefaultMenu(_:)), keyEquivalent: "")
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: "Hide Marko", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         let hideOthers = appMenu.addItem(withTitle: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
@@ -320,6 +327,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         let queued = pendingURLs
         pendingURLs = []
         queued.forEach(open)
+        offerDefaultOnFirstLaunch()
+    }
+
+    // MARK: - Default app for Markdown
+
+    private var markdownTypes: [UTType] {
+        var types: [UTType] = []
+        for id in ["net.daringfireball.markdown", "public.markdown"] { if let t = UTType(id) { types.append(t) } }
+        for ext in ["md", "markdown", "mdown", "mdx"] { if let t = UTType(filenameExtension: ext) { types.append(t) } }
+        var seen = Set<String>()
+        return types.filter { seen.insert($0.identifier).inserted }
+    }
+
+    private func offerDefaultOnFirstLaunch() {
+        let key = "marko.askedDefault"
+        guard !UserDefaults.standard.bool(forKey: key), !CommandLine.arguments.contains("--set-default") else { return }
+        UserDefaults.standard.set(true, forKey: key)
+        let alert = NSAlert()
+        alert.messageText = "Make Marko the default app for Markdown files?"
+        alert.informativeText = "Double-clicking .md and .markdown files in Finder will open them in Marko. You can change this later from Marko's menu or a file's Get Info panel."
+        alert.addButton(withTitle: "Make Default")
+        alert.addButton(withTitle: "Not Now")
+        alert.beginSheetModal(for: window) { [weak self] response in
+            if response == .alertFirstButtonReturn { self?.setAsDefaultMarkdownApp(interactive: true, completion: nil) }
+        }
+    }
+
+    @objc func makeDefaultMenu(_ sender: Any?) { setAsDefaultMarkdownApp(interactive: true, completion: nil) }
+
+    func setAsDefaultMarkdownApp(interactive: Bool, completion: ((Bool) -> Void)?) {
+        let appURL = Bundle.main.bundleURL
+        let group = DispatchGroup()
+        let lock = NSLock()
+        var failures: [String] = []
+        for type in markdownTypes {
+            group.enter()
+            NSWorkspace.shared.setDefaultApplication(at: appURL, toOpen: type) { error in
+                if let error = error { lock.lock(); failures.append("\(type.identifier): \(error.localizedDescription)"); lock.unlock() }
+                group.leave()
+            }
+        }
+        group.notify(queue: .main) { [weak self] in
+            let ok = failures.isEmpty
+            if interactive, let self = self {
+                let alert = NSAlert()
+                alert.messageText = ok ? "Marko is now the default app for Markdown files." : "Couldn't set Marko as the default for every Markdown type."
+                alert.informativeText = ok ? "Double-click any .md file to open it here." : failures.joined(separator: "\n") + "\n\nYou can also set it from Finder: select a .md file, File ▸ Get Info ▸ Open with ▸ Marko ▸ Change All."
+                alert.beginSheetModal(for: self.window, completionHandler: nil)
+            }
+            completion?(ok)
+        }
     }
 
     // Links to other sites open in the default browser; the viewer itself stays in the app.
