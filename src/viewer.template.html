@@ -445,9 +445,11 @@
   const store = {
     key: 'marko:v2',
     read() { try { const raw = localStorage.getItem(this.key); if (raw) return JSON.parse(raw) || {}; } catch (e) { /* storage unavailable */ } return (window.__markoPrefs && typeof window.__markoPrefs === 'object') ? window.__markoPrefs : {}; },
-    write(obj) { try { localStorage.setItem(this.key, JSON.stringify(obj)); } catch (e) { /* storage unavailable */ } window.__markoPrefs = obj; try { if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.marko) window.webkit.messageHandlers.marko.postMessage({ cmd: 'prefs', data: JSON.stringify(obj) }); } catch (e) { /* no native host */ } },
+    write(obj) { try { localStorage.setItem(this.key, JSON.stringify(obj)); } catch (e) { /* storage unavailable */ } window.__markoPrefs = obj; postHost({ cmd: 'prefs', data: JSON.stringify(obj) }); },
     patch(fn) { const o = this.read(); fn(o); this.write(o); }
   };
+  // Native hosts: Marko.app (WebKit) and Marko for Windows (WebView2).
+  function postHost(msg) { try { if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.marko) { window.webkit.messageHandlers.marko.postMessage(msg); return; } if (window.chrome && window.chrome.webview && window.chrome.webview.postMessage) window.chrome.webview.postMessage(msg); } catch (e) { /* no native host */ } }
   const saved = store.read();
   const prefs = Object.assign({ size: 19, measure: 'normal', panels: { reading: { outline: false, inspector: false }, plan: { outline: false, inspector: false }, interactive: { outline: false, inspector: false } } }, saved.prefs || {});
 
@@ -1024,7 +1026,9 @@
     search() { $('#search').focus(); }
   };
   // Tell a native host (if any) about document changes so it can set the window title.
-  const notifyHost = () => { try { if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.marko) window.webkit.messageHandlers.marko.postMessage({ cmd: 'title', title: window.marko.title(), mode: state.mode }); } catch (e) { /* not in a native host */ } };
+  const notifyHost = () => postHost({ cmd: 'title', title: window.marko.title(), mode: state.mode });
+  // Windows host: WebView2 keeps Ctrl-shortcuts inside the page, so forward the ones the app's menus own.
+  if (document.documentElement.dataset.app === 'windows') window.addEventListener('keydown', e => { if ((e.ctrlKey && ['o', 'f', '1', '2', '3', '0', '+', '=', '-'].includes(e.key.toLowerCase())) || e.key === 'F5' || e.key === 'F1') { e.preventDefault(); postHost({ cmd: 'key', key: e.key, ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey }); } });
   new MutationObserver(notifyHost).observe($('#doc-name'), { childList: true, characterData: true, subtree: true });
   if (typeof marked !== 'undefined' && (!hasHljs || !hasMermaid)) { const w = document.createElement('div'); w.className = 'lib-warning'; w.textContent = `Optional libraries didn't load (${[!hasHljs && 'syntax highlighting', !hasMermaid && 'diagrams'].filter(Boolean).join(', ')}). Code shows plain; diagrams show their source.`; docEl.prepend(w); }
 })();
