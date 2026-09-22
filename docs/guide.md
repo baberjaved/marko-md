@@ -117,9 +117,9 @@ Switch with the control at the top right or the keys `1` `2` `3`. Marko picks a 
 
 ### 4.3 The three panes
 
-- **Outline** (left) — every heading; the current one is highlighted as you scroll. In Plan mode each phase shows a small progress line. Toggle with the button at the far left.
+- **Outline** (left) — every heading; the current one is highlighted as you scroll. In Plan mode each phase shows a small progress line.
 - **Document** (centre) — the file, in the current mode. A thin blue line under the toolbar shows how far you have read.
-- **Panel** (right) — what the mode needs: text controls and document facts (Reading), progress and extracted questions and risks (Plan), filters and section actions (Interactive). Hidden by default in Reading. Toggle with the button at the far right; the choice is remembered per mode.
+- **Panel** (right) — what the mode needs: text controls and document facts (Reading), progress and extracted questions and risks (Plan), filters and section actions (Interactive). Both sidebars start hidden; toggle them with the buttons at the far left and far right, and Marko remembers your choice per mode (along with text size, width and checkbox ticks).
 
 ### 4.4 Tasks and writing them back
 
@@ -127,7 +127,7 @@ In Plan and Interactive mode, click a checkbox to tick a task. Progress updates 
 
 ### 4.5 Search and filters
 
-Type in the search field (or press `/`). Matches are highlighted and sections without a match fold away; the count appears in the field. In Interactive mode the panel's switches narrow the page to sections that contain tasks, code, tables, callouts or diagrams.
+Type in the search field (or press `/`). Matches are highlighted and sections without a match fold away; press **Enter** to step to the next match and **Shift+Enter** for the previous one — the field shows where you are (`3/12`). In Interactive mode the panel's switches narrow the page to sections that contain tasks, code, tables, callouts or diagrams.
 
 ### 4.6 The section menu
 

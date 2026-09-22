@@ -444,12 +444,12 @@
   /* ---------- storage (per-browser conveniences only) ---------- */
   const store = {
     key: 'marko:v2',
-    read() { try { return JSON.parse(localStorage.getItem(this.key) || '{}') || {}; } catch (e) { return {}; } },
-    write(obj) { try { localStorage.setItem(this.key, JSON.stringify(obj)); } catch (e) { /* storage unavailable */ } },
+    read() { try { const raw = localStorage.getItem(this.key); if (raw) return JSON.parse(raw) || {}; } catch (e) { /* storage unavailable */ } return (window.__markoPrefs && typeof window.__markoPrefs === 'object') ? window.__markoPrefs : {}; },
+    write(obj) { try { localStorage.setItem(this.key, JSON.stringify(obj)); } catch (e) { /* storage unavailable */ } window.__markoPrefs = obj; try { if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.marko) window.webkit.messageHandlers.marko.postMessage({ cmd: 'prefs', data: JSON.stringify(obj) }); } catch (e) { /* no native host */ } },
     patch(fn) { const o = this.read(); fn(o); this.write(o); }
   };
   const saved = store.read();
-  const prefs = Object.assign({ size: 19, measure: 'normal', panels: { reading: { outline: true, inspector: false }, plan: { outline: true, inspector: true }, interactive: { outline: true, inspector: true } } }, saved.prefs || {});
+  const prefs = Object.assign({ size: 19, measure: 'normal', panels: { reading: { outline: false, inspector: false }, plan: { outline: false, inspector: false }, interactive: { outline: false, inspector: false } } }, saved.prefs || {});
 
   /* ---------- document state ---------- */
   const state = { name: '', source: '', body: '', fm: {}, mode: 'reading', tree: null, tasks: [], ticks: {}, hash: '', search: '', filters: new Set(), focus: null, provenance: '' };
@@ -775,8 +775,15 @@
       }
       $$('.sec', docEl).forEach(s => { const hit = !!s.querySelector('mark'); s.classList.toggle('hidden-by-search', !hit); if (hit) setCollapsed(s, false); });
     } else $$('.sec', docEl).forEach(s => s.classList.remove('hidden-by-search'));
-    $('#search-count').textContent = q ? (n ? n : '0') : '';
-    const first = $('mark', docEl); if (first) { first.classList.add('current'); first.scrollIntoView({ block: 'center' }); }
+    state.marks = $$('mark', docEl); state.markIdx = -1;
+    if (state.marks.length) gotoMark(0); else $('#search-count').textContent = q ? '0' : '';
+  }
+  function gotoMark(i) {
+    const marks = (state.marks || []).filter(m => m.getClientRects().length); if (!marks.length) return;
+    const idx = ((i % marks.length) + marks.length) % marks.length;
+    (state.marks || []).forEach(m => m.classList.remove('current'));
+    const m = marks[idx]; m.classList.add('current'); m.scrollIntoView({ block: 'center' });
+    state.markIdx = idx; $('#search-count').textContent = `${idx + 1}/${marks.length}`;
   }
   function applyFilters() {
     const f = state.filters; const sel = { tasks: 'input.task-box', code: '.codeblock', tables: 'table', callouts: '.callout', diagrams: '.mermaid-block' };
@@ -918,6 +925,7 @@
   window.addEventListener('dragover', e => e.preventDefault());
   window.addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; overlay.hidden = true; const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) openFile(f); });
   let searchTmr; $('#search').addEventListener('input', e => { clearTimeout(searchTmr); searchTmr = setTimeout(() => { state.search = e.target.value; applySearch(); }, 90); });
+  $('#search').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (state.search !== e.target.value) { state.search = e.target.value; applySearch(); } else gotoMark((state.markIdx || 0) + (e.shiftKey ? -1 : 1)); } });
 
   docEl.addEventListener('change', e => {
     const box = e.target.closest('input.task-box'); if (!box) return;
