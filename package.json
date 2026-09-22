@@ -1,0 +1,43 @@
+{
+  "name": "marko-md",
+  "version": "0.2.0",
+  "description": "Marko \u2014 a Markdown viewer for Claude output with Reading, Plan and Interactive modes. CLI, live server, and Claude Code plugin.",
+  "bin": {
+    "marko": "bin/marko.js",
+    "marko-md": "bin/marko.js"
+  },
+  "files": [
+    "bin/",
+    "viewer/",
+    "skills/",
+    "hooks/",
+    ".claude-plugin/",
+    "claude-app/",
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node scripts/test.js",
+    "prepublishOnly": "node scripts/build.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "markdown",
+    "viewer",
+    "claude",
+    "claude-code",
+    "plan",
+    "docs"
+  ],
+  "author": "Baber Javed",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baberjaved/marko-md.git"
+  },
+  "homepage": "https://github.com/baberjaved/marko-md#readme"
+}
