@@ -2,3 +2,4 @@ src/
 scripts/test.js
 dist/
 .github/
+app/

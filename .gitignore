@@ -1,3 +1,5 @@
 node_modules/
 dist/*-local.html
 .DS_Store
+app/mac/build/
+app/mac/vendor-cache/

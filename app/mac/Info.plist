@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key>                 <string>Marko</string>
+  <key>CFBundleDisplayName</key>          <string>Marko</string>
+  <key>CFBundleIdentifier</key>           <string>com.baberjaved.marko</string>
+  <key>CFBundleVersion</key>              <string>__BUILD__</string>
+  <key>CFBundleShortVersionString</key>   <string>__VERSION__</string>
+  <key>CFBundlePackageType</key>          <string>APPL</string>
+  <key>CFBundleExecutable</key>           <string>Marko</string>
+  <key>CFBundleIconFile</key>             <string>Marko</string>
+  <key>CFBundleDevelopmentRegion</key>    <string>en</string>
+  <key>LSMinimumSystemVersion</key>       <string>12.0</string>
+  <key>LSApplicationCategoryType</key>    <string>public.app-category.productivity</string>
+  <key>NSHighResolutionCapable</key>      <true/>
+  <key>NSSupportsAutomaticTermination</key> <false/>
+  <key>NSHumanReadableCopyright</key>     <string>© 2026 Baber Javed. MIT License.</string>
+  <key>CFBundleDocumentTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeName</key>        <string>Markdown Document</string>
+      <key>CFBundleTypeRole</key>        <string>Viewer</string>
+      <key>LSHandlerRank</key>           <string>Alternate</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>net.daringfireball.markdown</string>
+        <string>public.markdown</string>
+      </array>
+      <key>CFBundleTypeExtensions</key>
+      <array>
+        <string>md</string>
+        <string>markdown</string>
+        <string>mdown</string>
+        <string>mdx</string>
+      </array>
+    </dict>
+    <dict>
+      <key>CFBundleTypeName</key>        <string>Plain Text</string>
+      <key>CFBundleTypeRole</key>        <string>Viewer</string>
+      <key>LSHandlerRank</key>           <string>None</string>
+      <key>LSItemContentTypes</key>
+      <array><string>public.plain-text</string></array>
+    </dict>
+  </array>
+  <key>UTImportedTypeDeclarations</key>
+  <array>
+    <dict>
+      <key>UTTypeIdentifier</key>        <string>net.daringfireball.markdown</string>
+      <key>UTTypeDescription</key>       <string>Markdown Document</string>
+      <key>UTTypeConformsTo</key>        <array><string>public.plain-text</string></array>
+      <key>UTTypeTagSpecification</key>
+      <dict>
+        <key>public.filename-extension</key> <array><string>md</string><string>markdown</string><string>mdown</string><string>mdx</string></array>
+        <key>public.mime-type</key>          <array><string>text/markdown</string></array>
+      </dict>
+    </dict>
+  </array>
+</dict>
+</plist>
