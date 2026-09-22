@@ -1,0 +1,14 @@
+{
+  "name": "marko-md",
+  "owner": { "name": "Baber Javed" },
+  "description": "Marko — a Markdown viewer for Claude output.",
+  "plugins": [
+    {
+      "name": "marko",
+      "description": "Open Markdown that Claude writes in a viewer with Reading, Plan and Interactive modes.",
+      "source": { "source": "github", "repo": "baberjaved/marko-md" },
+      "category": "productivity",
+      "keywords": ["markdown", "viewer", "plan", "docs"]
+    }
+  ]
+}

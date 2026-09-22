@@ -1,0 +1,11 @@
+{
+  "name": "marko",
+  "displayName": "Marko",
+  "version": "0.2.0",
+  "description": "Open Markdown that Claude writes in a viewer with Reading, Plan and Interactive modes. Adds /marko:view, a `marko` CLI, and hooks that surface plans, specs and reports the moment they are written.",
+  "author": { "name": "Baber Javed" },
+  "homepage": "https://github.com/baberjaved/marko-md",
+  "repository": "https://github.com/baberjaved/marko-md",
+  "license": "MIT",
+  "keywords": ["markdown", "viewer", "plan", "docs", "review"]
+}
