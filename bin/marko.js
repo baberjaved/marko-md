@@ -74,8 +74,8 @@ function modeFor(rel, cfg, explicit) {
 }
 
 function markoApp() {
-  if (process.platform !== 'darwin') return null;
-  for (const p of ['/Applications/Marko.app', path.join(os.homedir(), 'Applications', 'Marko.app')]) if (fs.existsSync(p)) return p;
+  if (process.platform === 'darwin') { for (const p of ['/Applications/Marko.app', path.join(os.homedir(), 'Applications', 'Marko.app')]) if (fs.existsSync(p)) return p; }
+  if (process.platform === 'win32') { const p = path.join(process.env.LOCALAPPDATA || '', 'Marko', 'Marko.exe'); if (process.env.LOCALAPPDATA && fs.existsSync(p)) return p; }
   return null;
 }
 function openInBrowser(target) {
@@ -119,8 +119,8 @@ async function cmdOpen(args) {
   const app = !args.browser && !args.static && cfg.app !== false && markoApp();
   if (app && !srv) {
     // Marko.app is installed: open the file natively (it watches the file for changes itself).
-    if (!args['no-browser']) { const child = spawn('open', ['-a', app, abs], { detached: true, stdio: 'ignore' }); child.on('error', () => {}); child.unref(); }
-    log(`Opened ${rel || abs} in Marko.app${mode ? ` (${mode} mode)` : ''}`);
+    if (!args['no-browser']) { const child = process.platform === 'darwin' ? spawn('open', ['-a', app, abs], { detached: true, stdio: 'ignore' }) : spawn(app, [abs], { detached: true, stdio: 'ignore' }); child.on('error', () => {}); child.unref(); }
+    log(`Opened ${rel || abs} in Marko${mode ? ` (${mode} mode)` : ''}`);
     return abs;
   }
   if (srv && !args.static) {
