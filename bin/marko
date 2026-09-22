@@ -1,0 +1,3 @@
+#!/bin/sh
+# Wrapper so the bare name `marko` works when this plugin's bin/ is on PATH.
+exec node "$(dirname "$0")/marko.js" "$@"
