@@ -3,3 +3,4 @@ scripts/test.js
 dist/
 .github/
 app/
+docs/screenshots/
