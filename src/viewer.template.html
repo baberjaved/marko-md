@@ -352,6 +352,7 @@
   .backdrop { display: none; position: absolute; inset: 0; z-index: 25; background: rgba(0, 0, 0, .25); }
 
   /* ---------- narrow ---------- */
+  :root[data-app="mac"] #toolbar { -webkit-user-select: none; user-select: none; }
   .narrow-only { display: none !important; }
   @media (max-width: 960px) {
     :root { --tb-h: 92px; }
@@ -1004,6 +1005,19 @@
   else if (embeddedText) openDocument(embeddedText, embedded.dataset.name || 'document.md', embedded.dataset.mode || null, true);
   else if (samples.length) openDocument(samples[0].text, samples[0].name, null, true);
   else render();
+  /* ---------- host bridge (Marko.app and other embedders) ---------- */
+  window.marko = {
+    open(text, name, mode) { openDocument(text, name || 'document.md', mode || null, true); },
+    setMode(m) { setMode(m); },
+    mode() { return state.mode; },
+    title() { return state.tree ? docTitle() : ''; },
+    updatedMarkdown() { return updatedMarkdown().text; },
+    togglePanel(which) { togglePanel(which); },
+    search() { $('#search').focus(); }
+  };
+  // Tell a native host (if any) about document changes so it can set the window title.
+  const notifyHost = () => { try { if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.marko) window.webkit.messageHandlers.marko.postMessage({ cmd: 'title', title: window.marko.title(), mode: state.mode }); } catch (e) { /* not in a native host */ } };
+  new MutationObserver(notifyHost).observe($('#doc-name'), { childList: true, characterData: true, subtree: true });
   if (typeof marked !== 'undefined' && (!hasHljs || !hasMermaid)) { const w = document.createElement('div'); w.className = 'lib-warning'; w.textContent = `Optional libraries didn't load (${[!hasHljs && 'syntax highlighting', !hasMermaid && 'diagrams'].filter(Boolean).join(', ')}). Code shows plain; diagrams show their source.`; docEl.prepend(w); }
 })();
 </script>
