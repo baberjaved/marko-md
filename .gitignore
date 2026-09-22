@@ -3,3 +3,8 @@ dist/*-local.html
 .DS_Store
 app/mac/build/
 app/mac/vendor-cache/
+app/windows/build/
+app/windows/vendor-cache/
+app/windows/viewer/
+app/windows/bin/
+app/windows/obj/
