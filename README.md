@@ -49,6 +49,16 @@ Download [`viewer/marko.html`](viewer/marko.html), open it in a browser, drag an
 - Pin the published Marko page in your Claude sidebar and drop files onto it, or
 - Add the skill in `claude-app/marko/` (Settings → Capabilities → Skills → upload the folder). Claude will then publish plans and reports it writes as Marko pages automatically, in the right mode.
 
+### E. Mac app
+
+A native, ~1 MB `Marko.app` for double-clicking `.md` files (with live reload when the file changes). Build it on your Mac with the Command Line Tools:
+
+```
+app/mac/build.sh --install
+```
+
+Details, DMG and notarization in [`app/mac/README.md`](app/mac/README.md). Once installed, `marko open` and the Claude Code hooks use the app instead of a browser tab.
+
 ## Use
 
 ```

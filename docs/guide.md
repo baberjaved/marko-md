@@ -76,6 +76,17 @@ The file works offline. It fetches three libraries (marked, highlight.js, mermai
 - **Pin it.** Open the published Marko page, pin it in the sidebar, and drop files onto it whenever you like.
 - **Let Claude use it.** Upload the `claude-app/marko` folder as a skill (Settings → Capabilities → Skills). From then on, when Claude writes a plan or report as Markdown it publishes it as a Marko page, already in the right mode.
 
+### 2.5 Mac app
+
+If you'd rather have an app in the Dock than a browser tab, build `Marko.app` (about 1 MB, native, no Electron). You need the Xcode Command Line Tools (`xcode-select --install`):
+
+```
+git clone https://github.com/baberjaved/marko-md && cd marko-md
+app/mac/build.sh --install
+```
+
+Then right-click any `.md` ▸ *Open With* ▸ *Marko* (tick *Always*), drag files onto the Dock icon, or run `open -a Marko file.md`. The app reloads the document whenever the file changes, so it doubles as the live view for Claude Code: once it is in `/Applications`, `marko open` and the hooks open files in the app instead of a browser. `⌘1` `⌘2` `⌘3` switch modes, `⌘F` searches, **File ▸ Copy Updated Markdown** writes your ticks back. See `app/mac/README.md` for a DMG and notarized builds for other people.
+
 ## 3. Verify the install
 
 ```
@@ -239,6 +250,7 @@ Marko understands ordinary Markdown. A few conventions make Plan mode shine, and
 | `marko: command not found` | npm's global bin folder isn't on your PATH — run `npm prefix -g` and add `<that>/bin` (on Windows, `<that>` itself) to your PATH. Inside Claude Code the plugin puts `marko` on the PATH by itself. |
 | `marko` runs some other program | The Marko.js framework also installs a `marko` command. Use `marko-md` instead; it is the same tool. |
 | Browser didn't open | Over SSH or in a container there may be no browser. The command prints the URL or path — open it locally, or run `marko serve --no-browser` and forward the port. |
+| `marko open` opens the app but I wanted a browser tab | Add `--browser`, or set `"app": false` in `.claude/marko.json`. |
 | Port 7331 in use | Marko tries the next five ports and prints the one it used, or set `"port"` in the config / `--port`. |
 | Hooks don't seem to run | Check `/plugin` shows Marko enabled and restart the session. Hooks call `node`, so Node must be on the PATH Claude Code uses. Confirm the file matches `watch` and not `ignore`. |
 | Diagrams show as text, code isn't coloured | The page couldn't reach cdnjs (offline or blocked). Everything else works; diagrams render again when online. |
