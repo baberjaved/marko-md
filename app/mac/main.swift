@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     private var watchedFD: Int32 = -1
     private var reloadTimer: Timer?
     private let recentsKey = "marko.recents"
+    private let prefsKey = "marko.prefs"
 
     // MARK: - Launch
 
@@ -26,6 +27,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         config.userContentController.add(self, name: "marko")
         // Mark the page as hosted by the Mac app before any of its scripts run.
         config.userContentController.addUserScript(WKUserScript(source: "document.documentElement.dataset.app='mac';", injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        // Seed the viewer's preferences (mode, sidebars, text size, checkbox ticks) from UserDefaults so they survive even if
+        // WebKit's storage for file:// pages is cleared.
+        if let saved = UserDefaults.standard.string(forKey: prefsKey), !saved.isEmpty {
+            config.userContentController.addUserScript(WKUserScript(source: "window.__markoPrefs = \(saved);", injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        }
         config.preferences.setValue(true, forKey: "developerExtrasEnabled")
 
         web = WKWebView(frame: .zero, configuration: config)
@@ -401,10 +407,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     }
 
     func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let body = message.body as? [String: Any], body["cmd"] as? String == "title" else { return }
-        let title = (body["title"] as? String ?? "").trimmingCharacters(in: .whitespaces)
-        window.title = title.isEmpty ? "Marko" : title
-        if let url = currentURL { window.representedURL = url }
+        guard let body = message.body as? [String: Any], let cmd = body["cmd"] as? String else { return }
+        switch cmd {
+        case "title":
+            let title = (body["title"] as? String ?? "").trimmingCharacters(in: .whitespaces)
+            window.title = title.isEmpty ? "Marko" : title
+            if let url = currentURL { window.representedURL = url }
+        case "prefs":
+            if let json = body["data"] as? String, json.count < 512_000 { UserDefaults.standard.set(json, forKey: prefsKey) }
+        default:
+            break
+        }
     }
 }
 
