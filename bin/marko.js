@@ -3,7 +3,7 @@
  * marko — open Markdown written by Claude in the Marko viewer.
  * Zero dependencies. Node 18+.
  *
- *   marko open <file> [--mode reading|plan|interactive] [--no-browser]
+ *   marko open <file> [--mode reading|plan|interactive] [--browser] [--no-browser]
  *   marko serve [file] [--port 7331] [--no-browser]
  *   marko recent [-n 10]
  *   marko hook post-tool-use | stop        (called by Claude Code hooks; reads JSON on stdin)
@@ -73,6 +73,11 @@ function modeFor(rel, cfg, explicit) {
   return '';
 }
 
+function markoApp() {
+  if (process.platform !== 'darwin') return null;
+  for (const p of ['/Applications/Marko.app', path.join(os.homedir(), 'Applications', 'Marko.app')]) if (fs.existsSync(p)) return p;
+  return null;
+}
 function openInBrowser(target) {
   const p = process.platform;
   const [cmd, args] = p === 'darwin' ? ['open', [target]] : p === 'win32' ? ['cmd', ['/c', 'start', '', target]] : ['xdg-open', [target]];
@@ -111,6 +116,13 @@ async function cmdOpen(args) {
   const mode = modeFor(rel, cfg, args.mode);
   const srv = serverInfo();
   let target;
+  const app = !args.browser && !args.static && cfg.app !== false && markoApp();
+  if (app && !srv) {
+    // Marko.app is installed: open the file natively (it watches the file for changes itself).
+    if (!args['no-browser']) { const child = spawn('open', ['-a', app, abs], { detached: true, stdio: 'ignore' }); child.on('error', () => {}); child.unref(); }
+    log(`Opened ${rel || abs} in Marko.app${mode ? ` (${mode} mode)` : ''}`);
+    return abs;
+  }
   if (srv && !args.static) {
     // A live server is running: use it so the tab refreshes when the file changes.
     const ok = await notifyServer(srv, { file: abs, mode });
@@ -283,7 +295,8 @@ function fail(msg) { console.error(msg); process.exit(1); }
 function help() {
   log(`marko ${VERSION} — Markdown viewer for Claude output
 
-  marko open <file> [--mode reading|plan|interactive] [--no-browser] [--static]
+  marko open <file> [--mode reading|plan|interactive] [--browser] [--no-browser]
+                                                      opens in Marko.app when installed, else the browser
   marko serve [file] [--port 7331] [--no-browser]     live view: refreshes when the file changes
   marko recent [-n 10]                                Markdown files Claude wrote recently
   marko path                                          location of the viewer HTML
